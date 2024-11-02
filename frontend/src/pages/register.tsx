@@ -101,7 +101,7 @@ const Register: React.FC = () => {
           )}
         </div>
         <div className="mt-6 text-center">
-          <a href="#" className="text-gray-600 hover:underline">Forgot password?</a>
+          <Link to="/forgot-password" className="text-gray-600 hover:underline">Forgot password?</Link>
         </div>
         <div className="mt-2 text-center">
           <p className="text-gray-600">

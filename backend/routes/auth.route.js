@@ -92,5 +92,35 @@ router.post('/login', (req, res) => {
     })
 })
 
+router.put("/renew-password", (req, res) => {
+    const {email, password, confirmPassword} = req.body
+    const validationError = valideasy(req.body, ["email", "password", "confirmPassword"])
+    if (validationError) {
+        return res.json({error: true, message: validationError})
+    }
+    if (password !== confirmPassword) {
+        return res.json({error: true, message: "Passwords should match!"})
+    }
+    const findUser = "select * from users where email = ?"
+    db.query(findUser, [email], async (err, data) => {
+        if (err) {
+            return res.json({error: true, message: `Database error: ${err.message}`})
+        }
+        if (data.length === 0) {
+            return res.json({error: true, message: "Email not found!"})
+        }
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const updatePassword = "update users set password = ? where email = ?"
+        db.query(updatePassword, [hashedPassword, email], (err, data) => {
+            if (err) {
+                return res.json({error: true, message: `Database error: ${err.message}`})
+            }
+            if (data) {
+                return res.json({success: true, message: "Successfully updated."})
+            }
+        })
+    })
+})
+
 
 export default router
