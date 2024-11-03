@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
-import axios from 'axios'
 import Movies from '../interfaces/movies'
+import axiosInstance from '../utils/axios.instance.ts'
 
 export interface MoviesState {
     movies: Movies[],
@@ -28,7 +28,7 @@ export const fetchMovies = createAsyncThunk(
                 count: params.count.toString(),
                 sortBy: params.sortBy
             }).toString()
-            const response = await axios.get(`http://localhost:5000/all-movies?${queryString}`)
+            const response = await axiosInstance.get(`/all-movies?${queryString}`)
             if (response.data.success) {
                 return response.data.message
             } else {
@@ -47,7 +47,7 @@ export const searchMovies = createAsyncThunk(
             const queryString = new URLSearchParams({
                 search: params.search
             }).toString()
-            const response = await axios.get(`http://localhost:5000/search-movie?${queryString}`)
+            const response = await axiosInstance.get(`/search-movie?${queryString}`)
             if (response.data.success) {
                 return response.data.message
             } else {
@@ -59,6 +59,36 @@ export const searchMovies = createAsyncThunk(
     }
 )
 
+export const downloadMovies = createAsyncThunk(
+    "movies/downloadMovies",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get("/download-movies");
+            if (response.data.success) {
+                const moviesData = response.data.message
+                const json = JSON.stringify(moviesData, null, 2)
+                const blob = new Blob([json], { type: "application/json" });
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "moviesData.json";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url)
+                return
+            } else if (response.data.error && response.data.message === "Token not provided!") {
+                return rejectWithValue("Not registered!")
+            } else {
+                return rejectWithValue(response.data.message)
+            }
+        } catch (error) {
+            return rejectWithValue((error as Error).message);
+        }
+    }
+);
+
+
 const moviesSlice = createSlice({
     name: "movies",
     initialState,
@@ -66,6 +96,9 @@ const moviesSlice = createSlice({
         resetSearchResults: (state) => {
             state.searchMovie = [];
         },
+        resetError: (state) => {
+            state.error = null
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -93,8 +126,11 @@ const moviesSlice = createSlice({
             state.searchloading = false
             state.searchError = action.payload as string
         })
+        .addCase(downloadMovies.rejected, (state, action) => {
+            state.error = action.payload as string
+        })
     }
 })
 
-export const { resetSearchResults } = moviesSlice.actions;
+export const { resetSearchResults, resetError } = moviesSlice.actions;
 export default moviesSlice.reducer

@@ -16,7 +16,11 @@ const Register: React.FC = () => {
 
   const handleVerify = async () => {
     dispatch(verifyUser({email, verifCode}))
-  };
+  }
+
+  if (localStorage.getItem('imdb_token')) {
+    window.location.href = '/'
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">

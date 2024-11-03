@@ -5,6 +5,7 @@ import Home from './pages/home'
 import Register from './pages/register'
 import Login from './pages/login'
 import ForgotPassword from './pages/forgot.password'
+import Footer from './components/footer.tsx'
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Route path='/login' element={<Login/>} />
         <Route path='/forgot-password' element={<ForgotPassword/>} />
       </Routes>
+      <Footer/>
     </div>
   )
 }

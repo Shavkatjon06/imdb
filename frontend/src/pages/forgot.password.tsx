@@ -14,6 +14,10 @@ const ForgotPassword: React.FC = () => {
     dispatch(forgotPassword({email, password, confirmPassword}))
   }
 
+  if (localStorage.getItem('imdb_token')) {
+    window.location.href = '/'
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md mx-2 md:mx-0">

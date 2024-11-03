@@ -1,5 +1,7 @@
 import { Router } from "express";
 import db from "../services/mysql.db.js";
+import authenticateToken from "../services/auth.token.js";
+import path from 'path'
 
 const router = Router()
 
@@ -48,8 +50,18 @@ router.get("/search-movie", (req, res) => {
         if (data.length === 0) {
             return res.json({error: true, message: "Nothing was found!"})
         }
-        res.json({ success: true, message: data });
-    });
+        res.json({ success: true, message: data })
+    })
+})
+
+router.get("/download-movies", authenticateToken, (req, res) => {
+    const movies = "select * from movies"
+    db.query(movies, (err, data) => {
+        if (err) {
+            return res.json({error: true, message: `Database error: ${err.message}`})
+        }
+        res.json({success: true, message: data})
+    })
 })
 
 export default router

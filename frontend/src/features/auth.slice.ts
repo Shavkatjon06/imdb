@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
-import axios from 'axios'
+import axiosInstance from '../utils/axios.instance.ts'
 
 export interface AuthState {
     loading: boolean,
@@ -19,7 +19,7 @@ export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (credentials: {email: string, password: string}, {rejectWithValue}) => {
         try {
-            const response = await axios.post("http://localhost:5000/login", credentials)
+            const response = await axiosInstance.post("/login", credentials)
             if (response.data.success) {
                 localStorage.setItem("imdb_token", response.data.imdb_token)
                 window.location.href = "/"
@@ -36,7 +36,7 @@ export const registerUser = createAsyncThunk(
     "auth/registerUser",
     async (credentials: {email: string, password: string}, {rejectWithValue}) => {
         try {
-            const response = await axios.post("http://localhost:5000/register", credentials)
+            const response = await axiosInstance.post("/register", credentials)
             if (response.data.success) {
                 return {message: response.data.message}
             } else {
@@ -52,7 +52,7 @@ export const verifyUser = createAsyncThunk(
     "auth/verifyUser",
     async (credentials: {email: string, verifCode: string}, {rejectWithValue}) => {
         try {
-            const response = await axios.post("http://localhost:5000/verify", credentials)
+            const response = await axiosInstance.post("/verify", credentials)
             if (response.data.success) {
                 localStorage.setItem('imdb_token', response.data.imdb_token)
                 window.location.href = '/'
@@ -69,7 +69,7 @@ export const forgotPassword = createAsyncThunk(
     "auth/forgotPassword",
     async (credentials: {email: string, password: string, confirmPassword: string}, {rejectWithValue}) => {
         try {
-            const response = await axios.post("http://localhost:5000/renew-password", credentials)
+            const response = await axiosInstance.post("/renew-password", credentials)
             if (response.data.success) {
                 return {message: response.data.message}
             } else {
