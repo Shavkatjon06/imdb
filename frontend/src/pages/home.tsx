@@ -1,42 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import Movies from '../interfaces/movies.ts'
-import axios from 'axios'
 import { MdViewList, MdViewModule, MdFilterList } from "react-icons/md";
 import GridView from '../components/grid.view.tsx';
 import DetailedView from '../components/detailed.view.tsx';
 import {countType, sortType} from '../interfaces/literals.ts'
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../features/hook.ts';
+import { fetchMovies } from '../features/movies.slice.ts';
+import { AppDispatch } from '../store.ts';
 
 
 const Home: React.FC = () => {
-  const [movies, setMovies] = useState<Movies[]>([])
-  const [error, setError] = useState<string>('')
-  const [loading, setLoading] = useState<boolean>(false)
   const [view, setView] = useState<"detailed" | "grid">("grid")
   const [count, setCount] = useState<countType>(25)
   const [sortBy, setSortBy] = useState<sortType>("Ranking")
+  const dispatch: AppDispatch = useDispatch()
+  const {movies, loading, error} = useAppSelector((state) => state.movies)
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const queryString = new URLSearchParams({
-          count: count.toString(),
-          sortBy
-        }).toString()
-        const response = await axios.get(`http://localhost:5000/all-movies?${queryString}`)
-        if (response.data.success) {
-          setMovies(response.data.message)
-        } else {
-          setError(response.data.message)
-        }
-      } catch (error) {
-        setError((error as Error).message)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [count, sortBy])
+    dispatch(fetchMovies({count, sortBy}))
+  }, [count, sortBy, dispatch])
 
   return (
     <div className="md:mt-6 bg-white w-full max-w-6xl min-h-[calc(100vh-65px)] mx-auto px-4 py-6 md:px-6 lg:px-8">

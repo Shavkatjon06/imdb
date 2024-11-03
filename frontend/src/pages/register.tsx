@@ -1,51 +1,21 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../features/hook';
+import { registerUser, verifyUser } from '../features/auth.slice';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [verifCode, setVerifCode] = useState<string>("")
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [success, setSuccess] = useState<string>("")
-  const [showVerification, setShowVerification] = useState(false)
+  const dispatch = useAppDispatch()
+  const {loading, error, success, showVerification} = useAppSelector((state) => state.auth)
 
-  const handleRegister = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      const response = await axios.post("http://localhost:5000/register", {email, password})
-      if (response.data.success) {
-        setSuccess(response.data.message)
-        setShowVerification(true)
-      } else {
-        setError(response.data.message)
-      }
-    } catch (error) {
-      setError((error as Error).message)
-    } finally {
-      setLoading(false)
-    }
+  const handleRegister = () => {
+    dispatch(registerUser({email, password}))
   }
 
   const handleVerify = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const response = await axios.post('http://localhost:5000/verify', { email, verifCode })
-      if (response.data.success) {
-          setError('');
-          localStorage.setItem('imdb_token', response.data.imdb_token)
-          window.location.href = '/'
-      } else {
-          setError(response.data.message)
-      }
-    } catch (error) {
-        setError((error as Error).message)
-    } finally {
-        setLoading(false)
-    }
+    dispatch(verifyUser({email, verifCode}))
   };
 
   return (

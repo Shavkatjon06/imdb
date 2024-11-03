@@ -1,32 +1,18 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../features/hook';
+import { forgotPassword } from '../features/auth.slice';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [confirmPassword, setConfirmPassword] = useState<string>("")
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [success, setSuccess] = useState<string>("")
+  const dispatch = useAppDispatch()
+  const {loading, error, success} = useAppSelector((state) => state.auth)
 
-  const handleLogin = async () => {
-    setLoading(true)
-    setError("")
-    setSuccess("")
-    try {
-      const response = await axios.put("http://localhost:5000/renew-password", {email, password, confirmPassword})
-      if (response.data.success) {
-        setSuccess(response.data.message)
-      } else {
-        setError(response.data.message)
-      }
-    } catch (error) {
-      setError((error as Error).message)
-    } finally {
-      setLoading(false)
-    }
-}
+  const resetPassword = async () => {
+    dispatch(forgotPassword({email, password, confirmPassword}))
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">
@@ -68,7 +54,7 @@ const ForgotPassword: React.FC = () => {
           </div>
           {success && <p className='text-green-600 font-semibold text-center'>{success}</p>}
           {error && <p className='text-red-600 font-semibold text-center'>{error}</p>}
-          <button onClick={handleLogin} className="w-full py-2 mt-4 text-white bg-black rounded-md hover:bg-gray-900" disabled={loading && true}>
+          <button onClick={resetPassword} className="w-full py-2 mt-4 text-white bg-black rounded-md hover:bg-gray-900" disabled={loading && true}>
               Reset{loading && "ting"} password
           </button>
         </div>

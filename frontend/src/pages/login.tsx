@@ -1,30 +1,17 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../features/hook';
+import { loginUser } from '../features/auth.slice';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
+  const dispatch = useAppDispatch()
+  const {loading, error} = useAppSelector((state) => state.auth)
 
-  const handleLogin = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      const response = await axios.post("http://localhost:5000/login", {email, password})
-      if (response.data.success) {
-        localStorage.setItem('imdb_token', response.data.imdb_token)
-        window.location.href = '/'
-      } else {
-        setError(response.data.message)
-      }
-    } catch (error) {
-      setError((error as Error).message)
-    } finally {
-      setLoading(false)
-    }
-}
+  const handleLogin = () => {
+    dispatch(loginUser({email, password}))
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">
