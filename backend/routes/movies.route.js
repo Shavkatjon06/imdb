@@ -33,4 +33,23 @@ router.get('/all-movies', (req, res) => {
     })
 })
 
+router.get("/search-movie", (req, res) => {
+    const { search } = req.query;
+    let searchMovieQuery = "SELECT * FROM movies";
+    const queryParams = [];
+    if (search && search.trim()) {
+        searchMovieQuery += " WHERE name LIKE ?";
+        queryParams.push(`%${search}%`);
+    }
+    db.query(searchMovieQuery, queryParams, (err, data) => {
+        if (err) {
+            return res.json({ error: true, message: `Database error: ${err.message}` });
+        }
+        if (data.length === 0) {
+            return res.json({error: true, message: "Nothing was found!"})
+        }
+        res.json({ success: true, message: data });
+    });
+})
+
 export default router

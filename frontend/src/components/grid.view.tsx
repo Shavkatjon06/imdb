@@ -1,14 +1,9 @@
 import React from 'react'
 import Movies from '../interfaces/movies'
 import { MdLocalMovies } from 'react-icons/md';
+import formatTime from '../utils/format.time.ts'
 
 const GridView: React.FC<{movies: Movies[]; loading: boolean}> = ({movies, loading}) => {
-  
-  const formatTime = (time: string): string => {
-    const formattedTime: number = Number(time.slice(0,-4))
-    const result: string = Math.floor(formattedTime / 60) + 'h ' + formattedTime % 60 + 'min'
-    return result
-  }
 
   return (
     <div className="border rounded p-3 mt-5 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
